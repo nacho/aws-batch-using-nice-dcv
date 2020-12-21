@@ -16,3 +16,26 @@ With this integration, multiple users can schedule interactive jobs via AWS Batc
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
 
+## Setup
+
+### Install docker
+
+```
+apt-get install docker.io
+```
+
+### Install nvidia docker
+
+https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker
+
+### Build the docker image
+
+```
+docker build -t dcv -f aws-batch-using-nice-dcv.dockerfile .
+```
+
+### Run the docker image
+
+```
+sudo docker run --rm -ti -v "/tmp/.X11-unix:/tmp/.X11-unix:rw"  -v /sys/fs/cgroup:/sys/fs/cgroup:ro --cap-add=SYS_ADMIN -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all -e DISPLAY=:0 --runtime=nvidia --privileged  --network host  -p 8443:8443/tcp dcv
+```
