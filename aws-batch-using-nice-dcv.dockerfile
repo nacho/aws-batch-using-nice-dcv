@@ -55,14 +55,8 @@ RUN wget -q http://us.download.nvidia.com/tesla/418.87/NVIDIA-Linux-x86_64-418.8
     nice-dcv-server-2020.0.8428-1.el7.x86_64.rpm \
     nice-xdcv-2020.0.296-1.el7.x86_64.rpm
 
-# Define the dcvserver.service
-COPY dcvserver.service /usr/lib/systemd/system/dcvserver.service
-
 # Start DCV server and initialize level 5
 COPY run_script.sh /usr/local/bin/
-
-# Send Notification message DCV session ready
-COPY send_dcvsessionready_notification.sh /usr/local/bin/
 
 # Open required port on firewall, create test user, send notification, start DCV session for the user
 COPY startup_script.sh /usr/local/bin
@@ -70,17 +64,8 @@ COPY startup_script.sh /usr/local/bin
 # Append the startup script to be executed at the end of initialization and fix permissions
 RUN echo "/usr/local/bin/startup_script.sh" >> "/etc/rc.local" \
  && chmod +x "/etc/rc.local" "/usr/local/bin/run_script.sh" \
-             "/usr/local/bin/send_dcvsessionready_notification.sh" \
              "/usr/local/bin/startup_script.sh"
 
 EXPOSE 8443
 
 CMD ["/usr/local/bin/run_script.sh"]
-
-FROM dcv
-# Install Paraview with requirements
-RUN yum -y install libgomp \
- && wget -q -O ParaView-5.8.0-MPI-Linux-Python3.7-64bit.tar.gz "https://www.paraview.org/paraview-downloads/download.php?submit=Download&version=v5.8&type=binary&os=Linux&downloadFile=ParaView-5.8.0-MPI-Linux-Python3.7-64bit.tar.gz" \
- && mkdir -p /opt/paraview \
- && tar zxf  ParaView-5.8.0-MPI-Linux-Python3.7-64bit.tar.gz --directory /opt/paraview/ --strip 1 \
- && rm -f ParaView-5.8.0-MPI-Linux-Python3.7-64bit.tar.gz
